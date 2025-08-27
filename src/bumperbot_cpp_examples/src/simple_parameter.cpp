@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 using std::placeholders::_1;
 
@@ -12,7 +13,7 @@ class SimpleParameter : public rclcpp::Node {
             declare_parameter<int>("simple_int_param", 28);
             declare_parameter<std::string>("simple_str_param", "bumperbot");
 
-            add_on_set_parameters_callback(std::bind(&SimpleParameter::paramChangeCallback, this, _1));
+            param_callback_handle_ = add_on_set_parameters_callback(std::bind(&SimpleParameter::paramChangeCallback, this, _1));
         }
 
     private:
@@ -22,9 +23,9 @@ class SimpleParameter : public rclcpp::Node {
             
             rcl_interfaces::msg::SetParametersResult result;
 
-            for (const auto & param : parameters) {
+            for (const auto& param : parameters) {
                 if (param.get_name() == "simple_int_param" && param.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER) {
-                    RCLCPP_INFO(get_logger(), "Changing simple_int_param from %d to %d", param.get_value<int>(), param.get_value<int>());
+                    RCLCPP_INFO(get_logger(), "Changing simple_int_param from %ld to %ld", param.get_value<int>(), param.get_value<int>());
                     result.successful = true;
                 }
 
